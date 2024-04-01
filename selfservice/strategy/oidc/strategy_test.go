@@ -419,7 +419,7 @@ func TestStrategy(t *testing.T) {
 				t,
 				json.RawMessage(fmt.Sprintf(`{"providers": [{"subject":"%s","provider":"%s"}]}`, subject, provider)),
 				json.RawMessage(c),
-				[]string{"providers.0.initial_id_token", "providers.0.initial_access_token", "providers.0.initial_refresh_token"},
+				[]string{"providers.0.initial_id_token", "providers.0.initial_access_token", "providers.0.initial_refresh_token", "providers.0.current_id_token", "providers.0.current_access_token", "providers.0.current_refresh_token"},
 			)
 		}
 
@@ -452,7 +452,7 @@ func TestStrategy(t *testing.T) {
 			t,
 			json.RawMessage(fmt.Sprintf(`{"providers": [{"subject":"%s","provider":"%s"}]}`, subject, provider)),
 			json.RawMessage(c),
-			[]string{"providers.0.initial_id_token", "providers.0.initial_access_token", "providers.0.initial_refresh_token"},
+			[]string{"providers.0.initial_id_token", "providers.0.initial_access_token", "providers.0.initial_refresh_token", "providers.0.current_id_token", "providers.0.current_access_token", "providers.0.current_refresh_token"},
 		)
 		return id
 	}
