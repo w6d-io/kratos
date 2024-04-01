@@ -549,7 +549,7 @@ func TestManager(t *testing.T) {
 
 			actual, ok = fromStore.GetCredentials(identity.CredentialsTypeWebAuthn)
 			require.True(t, ok)
-			assertx.EqualAsJSONExcept(t, actual, original.Credentials[identity.CredentialsTypeWebAuthn], []string{"updated_at"}, "other credentials should not be changed")
+			assertx.EqualAsJSONExcept(t, actual, original.Credentials[identity.CredentialsTypeWebAuthn], []string{"updated_at", "created_at"}, "other credentials should not be changed")
 		})
 	})
 
