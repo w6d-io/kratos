@@ -151,4 +151,3 @@ context("OpenID Provider Update", () => {
     })
   })
 })
-

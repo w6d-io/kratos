@@ -8,9 +8,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"reflect"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/gofrs/uuid"
 
