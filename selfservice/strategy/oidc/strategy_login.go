@@ -167,22 +167,49 @@ func (s *Strategy) processLogin(w http.ResponseWriter, r *http.Request, loginFlo
 
 	var oidcCredentials identity.CredentialsOIDC
 	if err := json.NewDecoder(bytes.NewBuffer(c.Config)).Decode(&oidcCredentials); err != nil {
-		return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, errors.WithStack(herodot.ErrInternalServerError.WithReason("The password credentials could not be decoded properly").WithDebug(err.Error())))
+		return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, errors.WithStack(herodot.ErrInternalServerError.WithReason("The OpenID connect credentials could not be decoded properly").WithDebug(err.Error())))
 	}
 
 	sess := session.NewInactiveSession()
 	sess.CompletedLoginForWithProvider(s.ID(), identity.AuthenticatorAssuranceLevel1, provider.Config().ID,
 		httprouter.ParamsFromContext(r.Context()).ByName("organization"))
-	for _, c := range oidcCredentials.Providers {
-		if c.Subject == claims.Subject && c.Provider == provider.Config().ID {
-			if err = s.d.LoginHookExecutor().PostLoginHook(w, r, node.OpenIDConnectGroup, loginFlow, i, sess, provider.Config().ID); err != nil {
-				return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, err)
-			}
-			return nil, nil
+
+	found := -1
+	for k := range oidcCredentials.Providers {
+		p := &oidcCredentials.Providers[k]
+		if p.Subject == claims.Subject && p.Provider == provider.Config().ID {
+			found = k
+			break
 		}
 	}
 
-	return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, errors.WithStack(herodot.ErrInternalServerError.WithReason("Unable to find matching OpenID Connect Credentials.").WithDebugf(`Unable to find credentials that match the given provider "%s" and subject "%s".`, provider.Config().ID, claims.Subject)))
+	if found == -1 {
+		return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, errors.WithStack(herodot.ErrInternalServerError.WithReason("Unable to find matching OpenID Connect Credentials.").WithDebugf(`Unable to find credentials that match the given provider "%s" and subject "%s".`, provider.Config().ID, claims.Subject)))
+	}
+
+	if err = s.d.LoginHookExecutor().PostLoginHook(w, r, node.OpenIDConnectGroup, loginFlow, i, sess, provider.Config().ID); err != nil {
+		return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, err)
+	}
+
+	if err := s.d.IdentityManager().UpdateCredentials(r.Context(), i.ID, identity.CredentialsTypeOIDC, func(toUpdate *identity.Credentials) error {
+		var toUpdateConfig identity.CredentialsOIDC
+		if err := toUpdate.UnmarshalConfig(toUpdate); err != nil {
+			return err
+		}
+		k, found := toUpdateConfig.GetProvider(provider.Config().ID, claims.Subject)
+		if !found {
+			// Credentials are not found, we can ignore this.
+			return nil
+		}
+		toUpdateConfig.Providers[k].CurrentIDToken = token.GetIDToken()
+		toUpdateConfig.Providers[k].CurrentAccessToken = token.GetAccessToken()
+		toUpdateConfig.Providers[k].CurrentRefreshToken = token.GetRefreshToken()
+		toUpdate.Config, err = json.Marshal(toUpdateConfig)
+		return errors.WithStack(err)
+	}); err != nil {
+		return nil, s.handleError(w, r, loginFlow, provider.Config().ID, nil, err)
+	}
+	return nil, nil
 }
 
 func (s *Strategy) Login(w http.ResponseWriter, r *http.Request, f *login.Flow, _ *session.Session) (i *identity.Identity, err error) {

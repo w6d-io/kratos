@@ -4,8 +4,11 @@
 package identity
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
+	"github.com/pkg/errors"
 	"reflect"
 	"time"
 
@@ -188,6 +191,10 @@ func (c Credentials) TableName(context.Context) string {
 
 func (c Credentials) GetID() uuid.UUID {
 	return c.ID
+}
+
+func (c Credentials) UnmarshalConfig(target interface{}) error {
+	return errors.WithStack(json.NewDecoder(bytes.NewBuffer(c.Config)).Decode(&target))
 }
 
 type (
