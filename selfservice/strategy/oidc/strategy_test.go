@@ -480,7 +480,7 @@ func TestStrategy(t *testing.T) {
 		var registrationAccessToken string
 		t.Run("case=should pass registration", func(t *testing.T) {
 			transientPayload := `{"data": "registration"}`
-			r := newBrowserRegistrationFlow(t, returnTS.URL, time.Minute)
+			r := newBrowserRegistrationFlow(t, returnTS.URL, 20*time.Second)
 			action := assertFormValues(t, r.ID, "valid")
 			res, body := makeRequest(t, "valid", action, url.Values{
 				"transient_payload": {transientPayload},
@@ -495,7 +495,7 @@ func TestStrategy(t *testing.T) {
 
 		t.Run("case=should pass login", func(t *testing.T) {
 			transientPayload := `{"data": "login"}`
-			r := newBrowserLoginFlow(t, returnTS.URL, time.Minute)
+			r := newBrowserLoginFlow(t, returnTS.URL, 20*time.Second)
 			action := assertFormValues(t, r.ID, "valid")
 			res, body := makeRequest(t, "valid", action, url.Values{
 				"transient_payload": {transientPayload},
@@ -508,7 +508,8 @@ func TestStrategy(t *testing.T) {
 		})
 		t.Run("case=token from login should not be the same", func(t *testing.T) {
 			transientPayload := `{"data": "login"}`
-			r := newBrowserLoginFlow(t, returnTS.URL, time.Minute)
+			time.Sleep(30 * time.Second)
+			r := newBrowserLoginFlow(t, returnTS.URL, 20*time.Second)
 			action := assertFormValues(t, r.ID, "valid")
 			res, body := makeRequest(t, "valid", action, url.Values{
 				"transient_payload": {transientPayload},
