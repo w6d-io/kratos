@@ -471,18 +471,18 @@ func TestStrategy(t *testing.T) {
 		subject = "register-then-login@ory.sh"
 		scope = []string{"openid", "offline"}
 
-		getInitialAccessToken := func(t *testing.T, provider string, body []byte) string {
-			i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
-			require.NoError(t, err)
-			c := i.Credentials[identity.CredentialsTypeOIDC].Config
-			return gjson.GetBytes(c, "providers.0.initial_access_token").String()
-		}
-		getCurrentAccessToken := func(t *testing.T, provider string, body []byte) string {
-			i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
-			require.NoError(t, err)
-			c := i.Credentials[identity.CredentialsTypeOIDC].Config
-			return gjson.GetBytes(c, "providers.0.current_access_token").String()
-		}
+		//getInitialAccessToken := func(t *testing.T, provider string, body []byte) string {
+		//	i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
+		//	require.NoError(t, err)
+		//	c := i.Credentials[identity.CredentialsTypeOIDC].Config
+		//	return gjson.GetBytes(c, "providers.0.initial_access_token").String()
+		//}
+		//getCurrentAccessToken := func(t *testing.T, provider string, body []byte) string {
+		//	i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
+		//	require.NoError(t, err)
+		//	c := i.Credentials[identity.CredentialsTypeOIDC].Config
+		//	return gjson.GetBytes(c, "providers.0.current_access_token").String()
+		//}
 		t.Run("case=should pass registration", func(t *testing.T) {
 			transientPayload := `{"data": "registration"}`
 			r := newBrowserRegistrationFlow(t, returnTS.URL, 20*time.Second)
