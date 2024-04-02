@@ -471,13 +471,18 @@ func TestStrategy(t *testing.T) {
 		subject = "register-then-login@ory.sh"
 		scope = []string{"openid", "offline"}
 
-		getAccessToken := func(t *testing.T, provider string, body []byte) string {
+		getInitialAccessToken := func(t *testing.T, provider string, body []byte) string {
 			i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
 			require.NoError(t, err)
 			c := i.Credentials[identity.CredentialsTypeOIDC].Config
 			return gjson.GetBytes(c, "providers.0.initial_access_token").String()
 		}
-		var registrationAccessToken string
+		getCurrentAccessToken := func(t *testing.T, provider string, body []byte) string {
+			i, err := reg.PrivilegedIdentityPool().GetIdentityConfidential(context.Background(), uuid.FromStringOrNil(gjson.GetBytes(body, "identity.id").String()))
+			require.NoError(t, err)
+			c := i.Credentials[identity.CredentialsTypeOIDC].Config
+			return gjson.GetBytes(c, "providers.0.current_access_token").String()
+		}
 		t.Run("case=should pass registration", func(t *testing.T) {
 			transientPayload := `{"data": "registration"}`
 			r := newBrowserRegistrationFlow(t, returnTS.URL, 20*time.Second)
@@ -490,7 +495,6 @@ func TestStrategy(t *testing.T) {
 			assert.Equal(t, "valid", gjson.GetBytes(body, "authentication_methods.0.provider").String(), "%s", body)
 
 			postRegistrationWebhook.AssertTransientPayload(t, transientPayload)
-			registrationAccessToken = getAccessToken(t, "valid", body)
 		})
 
 		t.Run("case=should pass login", func(t *testing.T) {
@@ -515,7 +519,7 @@ func TestStrategy(t *testing.T) {
 				"transient_payload": {transientPayload},
 			})
 			assertIdentity(t, res, body)
-			assert.NotEqual(t, getAccessToken(t, "valid", body), registrationAccessToken)
+			assert.NotEqual(t, getCurrentAccessToken(t, "valid", body), getInitialAccessToken(t, "valid", body))
 		})
 	})
 
