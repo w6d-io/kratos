@@ -42,7 +42,6 @@ context("OpenID Provider Update", () => {
 
       it("should be able to sign up, sign out, sign in and then check token", () => {
         const email = gen.email()
-
         cy.registerOidc({
           app,
           email,
@@ -77,7 +76,7 @@ context("OpenID Provider Update", () => {
         cy.get("#registration-password").should("not.exist")
         cy.get('[name="traits.email"]').should("have.value", email)
         cy.get('[name="traits.website"]').should("have.value", "http://s")
-        cy.get('[data-testid="ui/message/4000001"]').should(
+        cy.get('[data-testid="ui/message/4000003"]').should(
           "contain.text",
           "length must be >= 10",
         )

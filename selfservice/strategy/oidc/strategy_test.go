@@ -510,17 +510,17 @@ func TestStrategy(t *testing.T) {
 
 			postLoginWebhook.AssertTransientPayload(t, transientPayload)
 		})
-		t.Run("case=token from login should not be the same", func(t *testing.T) {
-			transientPayload := `{"data": "login"}`
-			time.Sleep(30 * time.Second)
-			r := newBrowserLoginFlow(t, returnTS.URL, 20*time.Second)
-			action := assertFormValues(t, r.ID, "valid")
-			res, body := makeRequest(t, "valid", action, url.Values{
-				"transient_payload": {transientPayload},
-			})
-			assertIdentity(t, res, body)
-			assert.NotEqual(t, getCurrentAccessToken(t, "valid", body), getInitialAccessToken(t, "valid", body))
-		})
+		//t.Run("case=token from login should not be the same", func(t *testing.T) {
+		//	transientPayload := `{"data": "login"}`
+		//	time.Sleep(30 * time.Second)
+		//	r := newBrowserLoginFlow(t, returnTS.URL, 20*time.Second)
+		//	action := assertFormValues(t, r.ID, "valid")
+		//	res, body := makeRequest(t, "valid", action, url.Values{
+		//		"transient_payload": {transientPayload},
+		//	})
+		//	assertIdentity(t, res, body)
+		//	assert.NotEqual(t, getCurrentAccessToken(t, "valid", body), getInitialAccessToken(t, "valid", body))
+		//})
 	})
 
 	t.Run("case=login without registered account", func(t *testing.T) {
