@@ -20,7 +20,7 @@ type CredentialsOIDC struct {
 	Providers []CredentialsOIDCProvider `json:"providers"`
 }
 
-// CredentialsOIDCProvider is contains a specific OpenID COnnect credential for a particular connection (e.g. Google).
+// CredentialsOIDCProvider is contains a specific OpenID Connect credential for a particular connection (e.g. Google).
 //
 // swagger:model identityCredentialsOidcProvider
 type CredentialsOIDCProvider struct {

@@ -192,10 +192,11 @@ func (s *Strategy) processLogin(w http.ResponseWriter, r *http.Request, loginFlo
 	}
 
 	if err := s.d.IdentityManager().UpdateCredentials(r.Context(), i.ID, identity.CredentialsTypeOIDC, func(toUpdate *identity.Credentials) error {
-		var toUpdateConfig identity.CredentialsOIDC
 		if err := toUpdate.UnmarshalConfig(toUpdate); err != nil {
 			return err
 		}
+		var toUpdateConfig identity.CredentialsOIDC
+		toUpdateConfig = oidcCredentials
 		k, found := toUpdateConfig.GetProvider(provider.Config().ID, claims.Subject)
 		if !found {
 			// Credentials are not found, we can ignore this.
