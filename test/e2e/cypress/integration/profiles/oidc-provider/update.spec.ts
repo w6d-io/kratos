@@ -24,6 +24,7 @@ context("OpenID Provider Update", () => {
       before(() => {
         cy.useConfigProfile(profile)
         cy.proxy(app)
+
       })
       beforeEach(() => {
         cy.clearAllCookies()
@@ -42,6 +43,8 @@ context("OpenID Provider Update", () => {
 
       it("should be able to sign up, sign out, sign in and then check token", () => {
         const email = gen.email()
+
+        // sign up
         cy.registerOidc({
           app,
           email,
@@ -89,6 +92,18 @@ context("OpenID Provider Update", () => {
         cy.get('[name="traits.newsletter"]').should("be.checked")
 
         cy.triggerOidc(app)
+
+        cy.location("pathname").should((loc) => {
+          expect(loc).to.be.oneOf(["/welcome", "/", "/sessions"])
+        })
+
+        // sign out
+
+        cy.logout()
+        cy.noSession()
+
+        // sign in
+        cy.loginOidc({app})
 
         cy.location("pathname").should((loc) => {
           expect(loc).to.be.oneOf(["/welcome", "/", "/sessions"])
@@ -146,6 +161,7 @@ context("OpenID Provider Update", () => {
             },
           )
         })
+
       })
     })
   })
