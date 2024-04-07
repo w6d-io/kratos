@@ -24,7 +24,6 @@ context("OpenID Provider Update", () => {
       before(() => {
         cy.useConfigProfile(profile)
         cy.proxy(app)
-
       })
       beforeEach(() => {
         cy.clearAllCookies()
@@ -103,7 +102,7 @@ context("OpenID Provider Update", () => {
         cy.noSession()
 
         // sign in
-        cy.loginOidc({app})
+        cy.loginOidc({ app })
 
         cy.location("pathname").should((loc) => {
           expect(loc).to.be.oneOf(["/welcome", "/", "/sessions"])
@@ -161,7 +160,6 @@ context("OpenID Provider Update", () => {
             },
           )
         })
-
       })
     })
   })

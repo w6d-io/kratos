@@ -195,8 +195,7 @@ func (s *Strategy) processLogin(w http.ResponseWriter, r *http.Request, loginFlo
 		if err := toUpdate.UnmarshalConfig(toUpdate); err != nil {
 			return err
 		}
-		var toUpdateConfig identity.CredentialsOIDC
-		toUpdateConfig = oidcCredentials
+		var toUpdateConfig = oidcCredentials
 		k, found := toUpdateConfig.GetProvider(provider.Config().ID, claims.Subject)
 		if !found {
 			// Credentials are not found, we can ignore this.
